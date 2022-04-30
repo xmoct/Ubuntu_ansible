@@ -1,0 +1,29 @@
+# 初始化openstack集群环境 （controller、compute、cinder...）
+- hosts: controllers controlled
+ roles:
+   - prepare
+
+# 安装keystone服务  （controller）
+- hosts: controllers
+ roles:
+   - keystone
+
+# 安装glance服务    （controller）
+- hosts: controllers
+ roles:
+   - glance
+
+# 安装nova服务  （controller、compute）
+- hosts: controllers controlled
+ roles:
+   - nova
+
+# 安装neutron服务   （controller、compute）
+- hosts: controllers controlled
+ roles:
+   - neutron
+
+# 安装dashboard服务 （controller）
+- hosts: controllers
+  roles:
+    - dashboard

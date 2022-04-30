@@ -1,0 +1,43 @@
+vi /etc/apache2/apache2.conf
+# 添加内容
+ServerName controller
+
+# 启动服务
+service apache2 restart
+# 配置管理账户
+export OS_USERNAME=admin
+export OS_PASSWORD=ADMIN_PASS
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+
+
+
+# 取消设置临时 变量OS_AUTH_URL和OS_PASSWORD环境变量
+unset OS_AUTH_URL OS_PASSWORD
+# 以admin用户身份请求身份验证令牌
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name admin --os-username admin token issue
+# myuser与前面创建的用户一样，请求身份验证令牌
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name myproject --os-username myuser token issue
+
+
+
+
+# 使用CirrOS（一个小型Linux映像，可帮助测试OpenStack部署）验证Image Service的运行 
+
+. admin-openrc
+# 下载源镜像
+wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+# 使用QCOW2磁盘格式，裸 容器格式和公共可见性将图像上传到图像服务
+openstack image create "cirros" \
+  --file cirros-0.4.0-x86_64-disk.img \
+  --disk-format qcow2 --container-format bare \
+  --public
+# 确认上传图片并验证属性
+openstack image list
